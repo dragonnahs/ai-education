@@ -10,9 +10,13 @@ import * as path from "path";
 const EMBEDDING_MODEL = "nomic-embed-text:latest";
 const LLM_MODEL = "llama3.2:1b";
 
-// 全局向量存储（实际生产环境应该使用持久化存储）
-let vectorStore: MemoryVectorStore | null = null;
-let isInitialized = false;
+// 使用global对象来存储状态，确保跨请求保持
+const globalAny = global as any;
+if (!globalAny.vectorStore) {
+  globalAny.vectorStore = null;
+  globalAny.isInitialized = false;
+  console.log("✅ 初始化全局状态");
+}
 
 // 初始化嵌入模型
 const embeddings = new OllamaEmbeddings({
@@ -54,10 +58,9 @@ export async function processPDF(filePath: string): Promise<{ success: boolean; 
 
     // 生成嵌入并存储到向量数据库
     console.log("🗄️ 正在生成向量并存入数据库...");
-    vectorStore = await MemoryVectorStore.fromDocuments(splitDocs, embeddings);
-    isInitialized = true;
-    
-    console.log("✅ 向量库构建完成！");
+    globalAny.vectorStore = await MemoryVectorStore.fromDocuments(splitDocs, embeddings);
+    globalAny.isInitialized = true;
+    console.log("✅ 向量库构建完成！", globalAny.isInitialized, globalAny.vectorStore);
     
     return { 
       success: true, 
@@ -84,8 +87,8 @@ export async function askQuestion(question: string): Promise<{
   error?: string;
 }> {
   try {
-    console.log("🔍 正在处理问题...", question, isInitialized, vectorStore);
-    if (!isInitialized || !vectorStore) {
+    console.log("🔍 正在处理问题...", question, globalAny.isInitialized, globalAny.vectorStore);
+    if (!globalAny.isInitialized || !globalAny.vectorStore) {
       return { 
         success: false, 
         answer: "", 
@@ -95,7 +98,7 @@ export async function askQuestion(question: string): Promise<{
 
     // 检索相关文档
     console.log("🔍 正在检索相关文档...");
-    const relevantDocs = await vectorStore.similaritySearch(question, 3);
+    const relevantDocs = await globalAny.vectorStore.similaritySearch(question, 3);
     
     if (relevantDocs.length === 0) {
       return { 
@@ -151,5 +154,6 @@ ${contextContent}
  * 检查系统是否已初始化
  */
 export function isSystemReady(): boolean {
-  return isInitialized;
+  console.log("isSystemReady:", globalAny.isInitialized);
+  return globalAny.isInitialized;
 }

@@ -4,17 +4,6 @@ import { askQuestion, isSystemReady } from '@/lib/rag';
 export async function POST(request: NextRequest) {
   try {
     // 检查系统是否已初始化
-    if (!isSystemReady()) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: '请先上传PDF文档',
-          answer: '' 
-        },
-        { status: 400 }
-      );
-    }
-
     const body = await request.json();
     const { question } = body;
 
