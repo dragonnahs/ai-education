@@ -1,6 +1,6 @@
 {
   "name": "teacher-rag-app",
-  "version": "1.0.0",
+  "version": "1.0.16-release.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "version-alpha": "npm version prerelease --preid=alpha --no-git-tag-version",
+    "version-patch-alpha": "npm version prepatch --preid=alpha --no-git-tag-versio",
     "version-release": "npm version prerelease --preid=release --no-git-tag-version",
-    "version-minor": "npm version minor--no-git-tag-version",
+    "version-patch-release": "npm version prepatch --preid=release --no-git-tag-version",
+    "version-minor": "npm version minor --no-git-tag-version",
     "version-patch": "npm version patch --no-git-tag-version"
   },
   "dependencies": {
