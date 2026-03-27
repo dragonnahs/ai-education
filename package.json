@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "version-alpha": "npm version prerelease --preid=alpha --no-git-tag-version",
+    "version-release": "npm version prerelease --preid=release --no-git-tag-version",
+    "version-minor": "npm version minor--no-git-tag-version",
+    "version-patch": "npm version patch --no-git-tag-version"
   },
   "dependencies": {
     "next": "14.2.0",

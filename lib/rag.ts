@@ -8,7 +8,7 @@ import * as path from "path";
 
 // 配置
 const EMBEDDING_MODEL = "nomic-embed-text:latest";
-const LLM_MODEL = "zen";
+const LLM_MODEL = "llama3.2:1b";
 
 // 全局向量存储（实际生产环境应该使用持久化存储）
 let vectorStore: MemoryVectorStore | null = null;
@@ -84,6 +84,7 @@ export async function askQuestion(question: string): Promise<{
   error?: string;
 }> {
   try {
+    console.log("🔍 正在处理问题...", question, isInitialized, vectorStore);
     if (!isInitialized || !vectorStore) {
       return { 
         success: false, 
