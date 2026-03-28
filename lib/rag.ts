@@ -1,5 +1,5 @@
 import { OllamaEmbeddings } from "@langchain/ollama";
-import { Ollama } from "@langchain/ollama";
+import { ChatOpenAI } from "@langchain/openai";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
@@ -8,7 +8,7 @@ import * as path from "path";
 
 // 配置
 const EMBEDDING_MODEL = "nomic-embed-text:latest";
-const LLM_MODEL = "llama3.2:1b";
+const LLM_MODEL = "z-ai/glm-4.5-air:free"; // 使用 OpenRouter 最新的免费大模型
 
 // 使用global对象来存储状态，确保跨请求保持
 const globalAny = global as any;
@@ -25,9 +25,13 @@ const embeddings = new OllamaEmbeddings({
 });
 
 // 初始化大模型
-const llm = new Ollama({
-  model: LLM_MODEL,
-  baseUrl: "http://localhost:11434",
+const llm = new ChatOpenAI({
+  modelName: LLM_MODEL,
+  openAIApiKey: "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",
+  configuration: {
+    baseURL: "https://openrouter.ai/api/v1",
+  },
+  temperature: 0.1,
 });
 
 /**
@@ -137,7 +141,7 @@ ${contextContent}
     
     return { 
       success: true, 
-      answer: response,
+      answer: typeof response === 'string' ? response : (response as any).content || String(response),
       sources
     };
   } catch (error) {
